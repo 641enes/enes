@@ -1,0 +1,308 @@
+create database hayvanat
+use hayvanat
+
+Create  table tur(
+    tur_id  int  primary  key   identity(1,1) NOT NULL,
+	latin_isim  VARCHAR (50)  NOT NULL,
+	ortak_isim  VARCHAR (50)  NOT NULL,
+	miktar int   NOT NULL,
+)
+
+Create  table  hayvan(
+	hayvan_id  int primary key identity(1,1) NOT NULL,
+	hayvan_isim  VARCHAR(25) NOT NULL,
+	dogum_tarih  DATE NOT NULL,
+	tur_id  int  foreign key references  tur(tur_id) NOT NULL,
+)
+
+Create table bakici(
+    bakici_id int  primary key identity(1,1) NOT NULL,
+	bakici_ismi  VARCHAR (50) NOT NULL,
+	bakici_adres  VARCHAR (50) NOT NULL,
+	bakici_sehir VARCHAR (50) NOT NULL,
+	bakici_devlet  varchar (20) NOT NULL,
+)
+
+Create  table  bolum(
+	bolum_id  int  primary key identity(1,1) NOT NULL,
+  	bolum_isim  VARCHAR(50) NOT NULL,
+  	bolum_yer  VARCHAR(50) NOT NULL,
+  	bolum_tanim  VARCHAR(75),
+)
+
+CREATE TABLE  hayvan_ev (
+	nakil_id int primary key identity(1,1) NOT NULL,
+	nakil_cins   int  NOT NULL,
+	giris_trh  DATE NOT NULL,
+	cikis_trh  DATE NOT NULL,
+	hayvan_id  int foreign key references hayvan(hayvan_id) NOT NULL,
+	bolum_id  int foreign key references bolum(bolum_id) NOT NULL
+)
+
+CREATE  TABLE  habitat (
+	habitat_id  int primary key identity(1,1) NOT NULL,
+	habitat_bolge  VARCHAR(50) NOT NULL,
+)
+
+CREATE TABLE  habitat_bolum (
+  habitat_id  int foreign key references habitat(habitat_id) NOT NULL,
+  bolum_id  int foreign key references bolum(bolum_id) NOT NULL
+  )
+
+  CREATE TABLE  habitat_tur (
+  tur_id int  foreign key references tur(tur_id) NOT NULL,
+  habitat_id  int foreign key references habitat(habitat_id) NOT NULL
+  )
+  
+   CREATE  TABLE  tur_bakici (
+	bakici_id  int foreign key references bakici(bakici_id) NOT NULL,
+	tur_id int  foreign key references tur(tur_id) NOT NULL
+)
+
+CREATE TABLE yuk (
+	yuk_id  int primary key identity(1,1) NOT NULL,
+	yuk_trh  DATE NOT NULL,
+	cins  int NOT NULL,
+    bakici_id  int foreign key references bakici(bakici_id) NOT NULL,
+	hayvan_id  int foreign key references hayvan(hayvan_id) NOT NULL
+) 
+
+CREATE TABLE besin(
+	besin_id int primary key identity(1,1) NOT NULL,
+	besin_isim VARCHAR(50) NOT NULL,
+	besin_zinciri int NOT NULL,
+	bakici_id int foreign key references bakici(bakici_id) NOT NULL
+)
+
+CREATE TABLE besin_liste (
+	besinliste_id int primary key identity(1,1) NOT NULL,
+	zaman_aralik int NOT NULL,
+	besin_kaynak VARCHAR(75) NOT NULL,
+	besin_miktar VARCHAR(75) NOT NULL,
+	besin_id int foreign key references besin(besin_id) NOT NULL,
+	hayvan_id int foreign key references hayvan(hayvan_id) NOT NULL
+)
+
+CREATE TABLE problem (
+	prob_id int primary key identity(1,1) NOT NULL,
+	prob_tip VARCHAR(50) NOT NULL
+)
+
+CREATE TABLE hayvan_cozum (
+  	cozum_id  int primary key identity(1,1) NOT NULL,
+  	cozum_tip VARCHAR (50) NOT NULL
+)
+
+CREATE TABLE hayvan_problem (
+  	hayvanProb_id int primary key identity(1,1) NOT NULL,
+  	hayvanProb_date DATE NOT NULL,
+	hayvan_id int foreign key references hayvan(hayvan_id) NOT NULL,
+	prob_id int foreign key references problem(prob_id) NOT NULL,	
+	cozum_id int foreign key references hayvan_cozum(cozum_id) NOT NULL
+)
+
+CREATE TABLE habitat_cozum (
+  	habcoz_id int primary key identity(1,1) NOT NULL,
+  	habcoz_tip VARCHAR(50) NOT NULL
+)
+
+CREATE TABLE bolum_problem (
+  	blmProb_id int primary key identity(1,1) NOT NULL,
+	blmProb_date DATE NOT NULL,
+	prob_id int foreign key references problem(prob_id) NOT NULL,	
+	bolum_id int foreign key references bolum(bolum_id),
+	habcoz_id int  foreign key references habitat_cozum(habcoz_id) NOT NULL
+)
+
+CREATE TABLE anagorev ( 
+	ana_id int primary key identity(1,1) NOT NULL,
+	gorev_ad VARCHAR(50) NOT NULL,
+	yapilacaklar VARCHAR(50) NOT NULL
+)
+
+CREATE TABLE isci(
+	isci_id int primary key identity(1,1),
+	isci_isim VARCHAR(25),
+	isci_soyisim VARCHAR(25)
+)
+
+CREATE TABLE calısan_isci (
+ 	calısanisci_id int primary key identity(1,1) NOT NULL,
+	isci_id int foreign key references isci(isci_id) NOT NULL,
+	bolum_id int foreign key references bolum(bolum_id) NOT NULL,
+	ana_id int  foreign key references  anagorev(ana_id) NOT NULL,
+	gun   VARCHAR (20) NOT NULL
+)
+
+INSERT INTO tur VALUES ('Pan Troglodytes', 'Common Chimpanzee', 12);
+INSERT INTO tur VALUES ('Panthera Tigris Tigris', 'Bengal Tiger', 6);
+INSERT INTO tur VALUES ('Panthera Leo', 'Lion', 9);
+INSERT INTO tur VALUES ('Ursus Maritimus', 'Polar Bear', 7);
+INSERT INTO tur VALUES ('Loxodonta Africana', 'African Bush Elephant', 3);
+select * from tur
+
+INSERT INTO hayvan VALUES('Maymun', '01/15/2001', 1);
+INSERT INTO  hayvan VALUES( 'Kaplan', '03/25/2002', 2);
+INSERT INTO hayvan VALUES( 'Aslan', '11/25/2004',3);
+INSERT INTO hayvan VALUES( 'Kutup Ayısı', '03/13/2010', 4);
+INSERT INTO hayvan VALUES('Fil','10/02/2004', 5);
+select * from  hayvan
+
+INSERT INTO bakici VALUES( 'Enes', 'Gebze Barış mah.','Kocaeli', 'TC'); 
+INSERT INTO bakici VALUES('Hayvansal Yiyecek ve Malzemeler', 'Bilecik hayvan barınağı', 'Bilecik', 'TC');
+INSERT INTO bakici VALUES('Bağış', 'herhangi bir yer', 'Türkiye', 'TC');
+INSERT INTO bakici VALUES( 'Mustafa', 'Beykoz Gazi mah', 'İstanbul', 'TC');
+INSERT INTO bakici VALUES('Osman', 'Merkez Bahçelievler', 'Karaman', 'TC');
+select * from bakici
+
+
+INSERT INTO bolum VALUES ('Regenstein Wolf Woods', 'Orman', 'ağaçlık orman');
+INSERT INTO bolum VALUES ('The Swamp', 'Bataklık', 'Düşük arazi bataklık');
+INSERT INTO bolum VALUES ('Australia House', 'tarla', 'Düz Arazi');
+INSERT INTO bolum VALUES ('Hoofed Animals', 'tarla', 'Düz Arazi');
+INSERT INTO bolum VALUES ('Salt Creek Wilderness', 'Tuzlu Su ile ağaçlık', 'Bir tuzlu su birikintisi ile bazı ahşap alanı');
+select * from bolum
+
+INSERT INTO hayvan_ev Values(8,'2005-12-12','2007-08-02', 3, 1 );
+INSERT INTO hayvan_ev Values( 72,'2000-06-17','2012-12-21', 4, 4);
+INSERT INTO hayvan_ev Values(99,'2007-05-22','2008-10-18', 5, 3);
+select * from hayvan_ev
+
+INSERT INTO habitat VALUES ('su');
+INSERT INTO habitat VALUES ('sulak');
+INSERT INTO habitat VALUES ('Bataklık');
+INSERT INTO habitat VALUES ('Tropikal');
+INSERT INTO habitat VALUES ('Çöl');
+select * from habitat
+
+
+INSERT INTO habitat_bolum	VALUES(1,1);
+INSERT INTO habitat_bolum	VALUES(2,2);
+INSERT INTO habitat_bolum	VALUES(3,3);
+INSERT INTO habitat_bolum	VALUES(4,4);
+INSERT INTO habitat_bolum	VALUES(5,5);
+select * from habitat_bolum
+
+INSERT INTO habitat_tur	VALUES (1, 1);
+INSERT INTO habitat_tur	VALUES (2, 2);
+INSERT INTO habitat_tur	VALUES (3,3);	
+INSERT INTO habitat_tur	VALUES (4, 4);
+INSERT INTO habitat_tur VALUES (5,5);
+select * from habitat_tur
+
+INSERT INTO tur_bakici	VALUES(1, 1);
+INSERT INTO tur_bakici	VALUES(2, 2);
+INSERT INTO tur_bakici	VALUES(3, 3);
+INSERT INTO tur_bakici	VALUES(4, 4);
+INSERT INTO tur_bakici	VALUES(5, 5);
+select * from tur_bakici
+
+INSERT INTO yuk	VALUES('2010-04-29', 1, 1, 3); 
+INSERT INTO yuk	VALUES('2010-04-14', 2, 2, 4); 
+INSERT INTO yuk	VALUES('2010-05-13', 3, 3, 5); 
+INSERT INTO yuk	VALUES('2010-05-28', 4, 4, 1); 
+INSERT INTO yuk	VALUES('2010-06-12', 5, 5, 2); 
+select * from yuk
+
+
+INSERT INTO besin  VALUES ('yulaf', '8000', '1');
+INSERT INTO besin   VALUES ('yer fıstığı', '6000', '2');
+INSERT INTO besin   VALUES ('muz', '6000', '3');
+INSERT INTO besin   VALUES ('havuçlar', '3000', '4');
+INSERT INTO besin   VALUES ('ringa', '750', '5');
+select * from besin
+
+
+INSERT INTO besin_liste  VALUES ('3' , 'Depo 2', '3 kg', '2', '3');
+INSERT INTO besin_liste  VALUES ('5' , 'Depo 5', '10 kg', '3', '4');
+INSERT INTO besin_liste  VALUES ('1' , 'Depo 2', '15 kg', '4', '5');
+INSERT INTO besin_liste  VALUES ('4' , 'Depo 3', '2 kg', '1', '2');
+INSERT INTO besin_liste  VALUES ('1' , 'Depo 1', '25 kg', '5', '1');
+select * from besin_liste
+
+
+INSERT INTO problem  VALUES ('Tıbbi');
+INSERT INTO problem  VALUES ('Bakım');
+INSERT INTO problem  VALUES ('Hayvan Davranışı');
+INSERT INTO problem  VALUES ('Tıbbi');
+INSERT INTO problem  VALUES ('Tıbbi');
+select * from problem
+
+INSERT INTO hayvan_cozum	VALUES('Bir hafta Antibiyotik');
+INSERT INTO hayvan_cozum	VALUES('izolasyon');
+INSERT INTO hayvan_cozum	VALUES('1 Ay Antibiyotik');
+INSERT INTO hayvan_cozum	VALUES('izolasyon');
+INSERT INTO hayvan_cozum	VALUES('Bir hafta Antibiyotik');
+select * from hayvan_cozum
+
+INSERT INTO habitat_cozum	VALUES('kuru temizlik');
+INSERT INTO habitat_cozum	VALUES('izolasyon');
+INSERT INTO habitat_cozum	VALUES('kapatma');
+INSERT INTO habitat_cozum	VALUES('döşeme');
+INSERT INTO habitat_cozum	VALUES('kaplama');
+select * from habitat_cozum
+
+INSERT INTO hayvan_problem	VALUES('12/05/2010', 3, 1, 1);
+INSERT INTO hayvan_problem	VALUES('10/10/2009', 1, 2, 2);
+INSERT INTO hayvan_problem	VALUES('12/05/2010', 5, 3, 3);
+INSERT INTO hayvan_problem	VALUES('6/15/2008', 2, 4, 4);
+INSERT INTO hayvan_problem	VALUES('8/01/2009', 4, 5, 5);
+select *  from hayvan_problem
+
+
+INSERT INTO bolum_problem	VALUES('1/05/2010', 1, 1, 1);
+INSERT INTO bolum_problem	VALUES('10/01/2009', 2, 2, 2); 
+INSERT INTO bolum_problem	VALUES('2/05/2010', 3, 3, 3);
+INSERT INTO bolum_problem	VALUES('6/01/2008',4, 4,4);
+INSERT INTO bolum_problem	VALUES('8/01/2009', 5, 5, 5);  
+select * from bolum_problem
+
+INSERT INTO anagorev	VALUES ('Atık Kamyoneti', 'Iskarta hayvan atıkları');
+INSERT INTO anagorev	VALUES ('Su Dolum', 'Hayvan konteynerleri doldurun');
+INSERT INTO anagorev	VALUES ('Refah Kontrol', 'Tüm hayvanlar kontrol');
+INSERT INTO anagorev	VALUES ('Aydınlatma', 'Ampuller değiştirin');
+INSERT INTO anagorev	VALUES ('Dezenfekte', 'Tüm sergiler kontrol');
+select * from anagorev
+
+INSERT INTO isci	VALUES( 'Ahmet ', 'Dursun');
+INSERT INTO isci	VALUES('Bekir', 'Kurt');
+INSERT INTO isci	VALUES('Hakan', 'Atalay');
+INSERT INTO isci	VALUES('Mehmet', 'Konmaz');
+INSERT INTO isci	VALUES('Hasan', 'Çelik');
+select * from isci
+
+INSERT INTO calısan_isci	VALUES (1, 1, 1, '10/10/2010');
+INSERT INTO calısan_isci	VALUES (2, 2, 2 ,'1/05/2009');
+INSERT INTO calısan_isci	VALUES ( 3, 3, 3,'12/25/2009');
+INSERT INTO calısan_isci	VALUES (4, 4, 4,'04/09/2010');
+INSERT INTO calısan_isci	VALUES (5, 5, 5,'05/26/2010');
+select * from calısan_isci
+
+
+
+1- Hangi hayvana hangi bakıcının baktığını gösteren sql sorgusunu yazınız
+
+select hayvan.hayvan_isim,bakici.bakici_ismi from hayvan,bakici,yuk where hayvan.hayvan_id=yuk.hayvan_id and bakici.bakici_id=yuk.bakici_id
+
+2- Enes ismindeki bakıcının beslediği hayvana kaç saatte bir besin verdiğini gösteren sql sorgusu yazınız 
+
+select   bakici.bakici_ismi,hayvan.hayvan_isim,besin_liste.zaman_aralik from bakici,hayvan,besin,besin_liste where 
+besin.bakici_id=bakici.bakici_id and besin.besin_id=besin_liste.besin_id and hayvan.hayvan_id=besin_liste.hayvan_id 
+and bakici.bakici_ismi='Veli'
+
+
+3- Hayvanların isimlerini hastalandıkları tarihi ve hastalıkları için nasıl bir çözüm yoluna gidileceğini bildiren sql sorgusu
+
+select hayvan.hayvan_isim, hayvan_problem.hayvanProb_date,hayvan_cozum.cozum_tip from hayvan,hayvan_problem,hayvan_cozum where 
+hayvan.hayvan_id = hayvan_problem.hayvan_id and hayvan_problem.cozum_id = hayvan_cozum.cozum_id 
+
+4- Habitat bölgelerindeki problemleri, problemin ortaya çıktığı tarihi çözümünü gösteren SQL sorgusu
+select habitat.habitat_bolge,habitat_cozum.habcoz_tip,bolum.bolum_isim,bolum_problem.blmProb_date from
+habitat,habitat_cozum,habitat_tur,bolum,bolum_problem,habitat_bolum where 
+habitat.habitat_id = habitat_bolum.habitat_id and habitat_bolum.bolum_id = bolum.bolum_id and bolum_problem.habcoz_id = habitat_cozum.habcoz_id group by
+habitat.habitat_bolge,habitat_cozum.habcoz_tip,bolum_problem.blmProb_date,bolum.bolum_isim 
+
+use hayvanat
+her bir hayvandan kaç tane var 
+
+select hayvan.hayvan_isim,tur.miktar from hayvan,tur where tur.tur_id = hayvan.tur_id
